@@ -19,7 +19,7 @@ if($_GET[add]=="ok")
                     
             $sql=mysqli_query($con,"insert into areas (nombre_area) values(lower('$_POST[nombre]'))");
             
-            if(!mysqli_error())
+            if(!mysqli_error($con))
             {
                 
                 echo "<script>alert('Registro Insertado Correctamente.');</script>";

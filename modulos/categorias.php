@@ -1,6 +1,7 @@
 <?php
 session_start();
 
+
 if($_SESSION[user]==0)
 {
     echo "<script>window.location='index.php';</script>";
@@ -17,7 +18,7 @@ if($_GET[add]=="ok")
 
             $sql=mysqli_query($con,"insert into categorias (nombre) values(lower('$_POST[nombre]'))");
             
-            if(!mysqli_error())
+            if(!mysqli_error($con))
             {
                 
                 echo "<script>alert('Registro Insertado Correctamente.');</script>";
@@ -40,7 +41,7 @@ if($_GET[mod]=="ok")
     if(($_POST[nombre]!=""))
     {
         
-            $sql=mysqli_query($con,"update categorias set nombre=lower('$_POST[nombre]') where id=$_POST[id]");
+            $sql=mysqli_query($con,"update categorias set nombre=lower('$_POST[nombre]') where id_categoria=$_POST[id_categoria]");
 
             if(!mysqli_error())
             {
@@ -79,7 +80,7 @@ if($_GET[mod]=="ok")
                         $showtable="";
                         if($_GET[ver]!=0)
                         {
-                            $sql=mysqli_query($con,"select *from categorias where id=$_GET[ver]");
+                            $sql=mysqli_query($con,"select *from categorias where id_categoria=$_GET[ver]");
                                 if(mysqli_num_rows($sql)!=0)
                                 {   
                                     $r=mysqli_fetch_array($sql);
@@ -104,7 +105,7 @@ if($_GET[mod]=="ok")
                                 </div>
                              
 
-                                <input type="hidden" name="id" id="id" value="<?php echo $r['id']; ?>">    
+                                <input type="hidden" name="id_categoria" id="id_categoria" value="<?php echo $r['id_categoria']; ?>">    
                                 <button type="submit" class="btn btn-primary" style="float:right;">Guardar</button>
                                 </form>
                             </div>
@@ -144,7 +145,7 @@ if($_GET[mod]=="ok")
                                                  <tr>
                                                      <td><?php echo $r['nombre']; ?></td>
                                                     
-                                                     <td><a href="home.php?pagina=categorias&ver=<?php echo $r['id'] ?>" title="Editar" alt="Editar"><i class="fas fa-edit icono_editar"></i></a> 
+                                                     <td><a href="home.php?pagina=categorias&ver=<?php echo $r['id_categoria'] ?>" title="Editar" alt="Editar"><i class="fas fa-edit icono_editar"></i></a> 
                                                        </td>
                                                  </tr>       
                                              <?php }
