@@ -12,13 +12,13 @@ error_reporting(E_ERROR | E_PARSE);
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <meta name="description" content="SysCSVD - Sistema de Gestión">
+    <meta name="description" content="Facturación Simple - Sistema de Gestión">
     <meta name="author" content="ADM">
 
-    <link rel="shortcut icon" href="">
+    <link rel="shortcut icon" href="img/logo_mmtrico4.png">
 
 
-    <title>SysCSVD - Sistema de Gestión</title>
+    <title>Facturación Simple - Sistema de Gestión</title>
 
 </head>
 
@@ -33,9 +33,7 @@ error_reporting(E_ERROR | E_PARSE);
             <!-- Sidebar - Brand -->
             <a class="sidebar-brand d-flex align-items-center justify-content-center" href="home.php">
                 <div class="sidebar-brand-icon">
-                    <!-- logo del home esquina sup izq -->
-                    <!-- <img src="img/logo_mmtr2.png" width="50%"> -->
-                    
+                    <img src="img/logo_mmtr2.png" width="50%">
                 </div>
                 <!--<div class="sidebar-brand-text mx-3">Instituto AAA</div>-->
             </a>
@@ -327,7 +325,7 @@ error_reporting(E_ERROR | E_PARSE);
             <footer class="sticky-footer bg-white">
                 <div class="container my-auto">
                     <div class="copyright text-center my-auto">
-                        <span>Copyright &copy; SysCSVD - Sistema de Gestión - 2023 - <a href="#"> SysCSVD </a></span>
+                        <span>Copyright &copy; Facturación Simple - Sistema de Gestión - 2022 - <a href="#"> FS </a></span>
                     </div>
                 </div>
             </footer>

@@ -15,37 +15,9 @@ if($_GET['add']=="ok")
     if(($_POST['nombre']!=""))
 
     {
-        $archivo=$_FILES['foto']['name'];
-        if($archivo!="")
-        {
-        $extension = explode(".",$archivo);
-                if((end($extension)=="jpg") || (end($extension)=="jpeg") || (end($extension)=="JPG") || (end($extension)=="JPEG") || (end($extension)=="png") || (end($extension)=="PNG"))
-                        {
-                            if (is_uploaded_file($_FILES['foto']['tmp_name'])) 
-                            {
-                            $qu=time();
-                            copy($_FILES['foto']['tmp_name'], "fotos/".$qu.".".end($extension));
-                            $archivo=$qu.".".end($extension);//aca queda guardado el nombre para la bd
-                            }
-                            else{
-                                    echo "<p>Error: No se pudo subir el archivo.</p>";
-                                }
-                        }
-                else{
-                        echo "<p>Error: El archivo debe ser una IMG</p>";
-                    }
-                }
-        else{
-            echo "<p>Error: Debe seleccionar un archivo.</p>";
-            }  
-
              echo $_POST['nombre'];      
-       
-         $sql = mysqli_query($con, "INSERT INTO productos (codigo_barra, nombre, descripcion, precio, stock, foto, id_categoria)
-         VALUES ('$_POST[codigo_barra]', lower('$_POST[nombre]'), '$_POST[descripcion]', '$_POST[precio]', '$_POST[stock]', '$archivo', $_POST[id_categoria])");
-
-         echo mysqli_error($con);
-
+        $sql=mysqli_query($con,"insert into productos (nombre, id_marca, precio, descripcion, id_categoria, codigo, orden) values(lower('$_POST[nombre]'), $_POST[marcas], lower('$_POST[precio]'),'$_POST[descripcion]',$_POST[categorias],'$_POST[codigo]', $_POST[orden])");
+        
         if(!mysqli_error($con))
         {
             echo "<script>alert('Registro Insertado Correctamente.');</script>";
@@ -62,81 +34,47 @@ if($_GET['add']=="ok")
         }
 }
 
-if ($_GET['mod'] == "ok") {
-    if (!empty($_POST['nombre'])) {
-        $archivo = "";
-        
-        // Verificar si se ha subido una foto
-        if (!empty($_FILES['foto']['name'])) {
-            $archivo = $_FILES['foto']['name'];
-            
-            // Realizar la comprobación de la extensión del archivo
-            $extension = explode(".", $archivo);
-            $extensionesPermitidas = array("jpg", "jpeg", "JPG", "JPEG", "png", "PNG");
-            
-            if (in_array(end($extension), $extensionesPermitidas)) {
-                if (is_uploaded_file($_FILES['foto']['tmp_name'])) {
-                    $qu = time();
-                    copy($_FILES['foto']['tmp_name'], "fotos/" . $qu . "." . end($extension));
-                    $archivo = "foto='" . $qu . "." . end($extension) . "'";
-                    
-                    // Eliminar la foto actual
-                    unlink('fotos/' . $_POST['foto_actual']);
-                } else {
-                    echo "<p>Error: No se pudo subir el archivo.</p>";
-                }
-            } else {
-                echo "<p>Error: El archivo debe ser una imagen.</p>";
+if($_GET['mod']=="ok")
+{
+
+    if(($_POST['nombre']!=""))
+    {
+        //controlo si cambia el precio, para agregar al historial
+        if($_POST['precio']!=$_POST['precio_actual'])
+            $sql=mysqli_query($con,"insert into productos_historial_precio (id_producto, precio) values($_POST[id], '$_POST[precio_actual]')");
+        //fin de controlar si cambia el precio, para agregar al historial              
+            $sql=mysqli_query($con,"update productos set nombre=lower('$_POST[nombre]'), id_marca=$_POST[marcas], precio='$_POST[precio]', descripcion='$_POST[descripcion]', id_categoria=$_POST[categorias], codigo='$_POST[codigo]', orden=$_POST[orden] where id=$_POST[id]");
+
+            if(!mysqli_error())
+            {
+               
+                echo "<script>alert('Registro Modificado Correctamente.');</script>";
+                echo "<script>window.location='home.php?pagina=productos';</script>";
             }
-        }
+                else
+                {
+                    echo "<script>alert('Error: No se pudo Modificar el registro.');</script>";
+                }
         
-        // Construir la consulta SQL
-        $sql = "UPDATE productos SET codigo_barra='" . $_POST['codigo_barra'] . "', nombre=lower('" . $_POST['nombre'] . "'), descripcion='" . $_POST['descripcion'] . "', precio='" . $_POST['precio'] . "', stock='" . $_POST['stock'] . "', id_categoria='" . $_POST['id_categoria'] . "'";
-        
-        if (!empty($archivo)) {
-            $sql .= ", " . $archivo;
-        }
-        
-        $sql .= " WHERE id_producto='" . $_POST['id_producto'] . "'";
-        
-        // Ejecutar la consulta SQL
-        $resultado = mysqli_query($con, $sql);
-        
-        if ($resultado) {
-            echo "<script>alert('Registro modificado correctamente.');</script>";
-            echo "<script>window.location='home.php?pagina=productos';</script>";
-        } else {
-            echo "<script>alert('Error: No se pudo modificar el registro.');</script>";
-            echo mysqli_error($con);
-        }
-    } else {
-        echo "<script>alert('Complete los campos obligatorios (*).');</script>";
     }
+        else
+        {
+            echo "<script>alert('Complete los Campos Obligatorios (*).');</script>";
+        }
 }
 
-
-
-
-if($_GET[del]!="")
+if($_GET[desactivar]!="")
 {
-    echo $_GET[del];
-    //se elimina foto  
-    $sql_foto="select foto from productos where id_producto=".$_GET['del'];
-	$r_foto=mysqli_fetch_array(mysqli_query($con, $sql_foto));
-	copy('fotos/'.$r_foto['foto'], 'fotos_anuladas/'.$_GET['del'].'_'.$r_foto['foto']);//copiar
-	unlink('fotos/'.$r_foto['foto']);//eliminar
 
-	//elimino el registro
-	$sql="delete from productos where id_producto=".$_GET['del'];
-	$resultado=mysqli_query($con,$sql);
-	if(!mysqli_error($con))
-
+        $sql=mysqli_query($con,"update productos set activo='no' where id=$_GET[desactivar]");
+        
+        if(!mysqli_error())
         {
-            echo "<script>alert('Registro Eliminado Correctamente.');</script>";
+            echo "<script>alert('Registro desactivado correctamente.');</script>";
             echo "<script>window.location='home.php?pagina=productos';</script>";
         }
-     else
-        {
+            else
+            {
                 echo "<script>alert('Error: No se pudo Eliminar el registro.');</script>";
             }
 
@@ -159,7 +97,7 @@ if($_GET[del]!="")
                         $showtable="";
                         if($_GET[ver]!=0)
                         {
-                            $sql=mysqli_query($con,"select *from productos where id_producto=$_GET[ver]");
+                            $sql=mysqli_query($con,"select *from productos where id=$_GET[ver]");
                                 if(mysqli_num_rows($sql)!=0)
                                 {   
                                     $r=mysqli_fetch_array($sql);
@@ -176,62 +114,81 @@ if($_GET[del]!="")
                         <div id="collapseNuevo" class="collapse <?php echo $showform; ?> m-1" aria-labelledby="headingOne" data-parent="#accordion">    
                             <div class="card-body" >
                
-                            <form action="<?php echo $url; ?>" method="POST" enctype="multipart/form-data">
+                                <form action="<?php echo $url; ?>" method="POST">
                                 <!--Fila 1-->
                                 <div class="form-group">
-                                    <label for="nombre">Código de Barras</label>
-                                    <input type="text" class="form-control" id="codigo_barra" name="codigo_barra" value="<?php echo $r['codigo_barra']; ?>" required>
+                                    <label for="nombre">Código</label>
+                                    <input type="text" class="form-control" id="codigo" name="codigo" value="<?php echo $r['codigo']; ?>" required>
                                 </div>
                                 <div class="form-group">
                                     <label for="nombre">Nombre</label>
                                     <input type="text" class="form-control" id="nombre" name="nombre" value="<?php echo $r['nombre']; ?>" required>
                                 </div>
                                
-                                <div class="form-group">
-                                    <label for="nombre">Descripción</label>
-                                    <textarea  class="form-control" type="text" name="descripcion" placeholder="descripción"  id="descripcion" rows="2"><?php if(!empty($r['descripcion'])) echo $r['descripcion'];?></textarea>
-                                </div>
-
-                                <div class="form-group">
-                                    <label for="nombre">Precio</label>
-                                    <input type="number" class="form-control" id="precio" name="precio" value="<?php echo $r['precio'];?>" required>
-                                </div>
-
-                                <div class="form-group">
-                                    <label for="nombre">Stock</label>
-                                    <input type="number" class="form-control" id="stock" name="stock" value="<?php echo $r['stock']; ?>" required>
-                                </div>
-
-                                <div class="form-group">
-                                    <label for="nombre">Foto</label>
-                                    <input type="file" name="foto" id="foto" >
-                                    <input type="hidden" name="foto_actual" id="foto_actual" value="<?php echo $r['foto'];?>">
-                                </div>
-
+                               
                                
                                 <div class="form-group">
-                                    <label for="nombre">Categoría</label>
-                                    <select name="id_categoria" id="id_categoria" class="form-control bg-light border-0 small" placeholder="Grupo"  aria-label="Grupo" aria-describedby="basic-addon2" style="margin-right: 1%;" required>
+                                    <label for="nombre">Categoria</label>
+                                    <select name="categorias" id="categorias" class="form-control bg-light border-0 small" placeholder="Categoria"  aria-label="Categoria
+                                    " aria-describedby="basic-addon2" style="margin-right: 1%;" required>
                                         <option value="">Seleccione...</option>
                                         <?php
-                                        $sql_g=mysqli_query($con,"select * from categorias order by nombre");
+                                        $sql_g=mysqli_query($con,"select *from categorias order by nombre");
                                         if(mysqli_num_rows($sql_g)!=0)
                                         {
                                             while($r_g=mysqli_fetch_array($sql_g))
-                                            {// el value es el id_categoria que paso por post al submitir ///////si id_categoria en categoria == id_categoria en productio entonces selecciono //////y muestro nombre de la categoria
+                                            {
                                                 ?>
-                                                <option value="<?php echo $r_g['id_categoria'];?>" <?php if($r_g['id_categoria']==$r['id_categoria']){?> selected <?php }?>><?php echo $r_g['nombre'];?></option>
+                                                <option value="<?php echo $r_g['id'];?>" <?php if($r_g['id']==$r['id_categoria']){?> selected <?php }?>><?php echo $r_g['nombre'];?></option>
                                                 <?php
                                             }
                                         }
                                         ?>
                                     </select>
-                                </div>                             
-                            
-                                <input type="hidden" name="id_producto" id="id_producto" value="<?php echo $r['id_producto']; ?>"> 
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="nombre">Marca</label>
+                                    <select name="marcas" id="marcas" class="form-control bg-light border-0 small" placeholder="Marca"  aria-label="Marca
+                                    " aria-describedby="basic-addon2" style="margin-right: 1%;" required>
+                                        <option value="">Seleccione...</option>
+                                        <?php
+                                        $sql_g=mysqli_query($con,"select *from marcas order by nombre");
+                                        if(mysqli_num_rows($sql_g)!=0)
+                                        {
+                                            while($r_g=mysqli_fetch_array($sql_g))
+                                            {
+                                                ?>
+                                                <option value="<?php echo $r_g['id'];?>" <?php if($r_g['id']==$r['id_marca']){?> selected <?php }?>><?php echo $r_g['nombre'];?></option>
+                                                <?php
+                                            }
+                                        }
+                                        ?>
+                                    </select>
+                                </div>
+                                
+                                
+                                <div class="form-group">
+                                    <label for="nombre">Precio</label>
+                                    <input type="text" class="form-control" id="precio" name="precio" value="<?php echo $r['precio'];?>" required>
+                                    <input type="hidden" id="precio_actual" name="precio_actual" value="<?php echo $r['precio'];?>">
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="nombre">Orden</label>
+                                    <input type="text" class="form-control" id="orden" name="orden" value="<?php echo $r['orden'];?>" required>
+                                    
+                                </div>
+                                
+                               
+                                <div class="form-group">
+                                    <label for="nombre">Descripción</label>
+                                    <textarea  class="form-control" type="text" name="descripcion" placeholder="Descripción"  id="descripcion" rows="5"><?php if(!empty($r['descripcion'])) echo $r['descripcion'];?></textarea>
+                                </div>
+                                
+                                <input type="hidden" name="id" id="id" value="<?php echo $r['id']; ?>">    
                                 <button type="submit" class="btn btn-primary" style="float:right;">Guardar</button>
-                            </form>
-                            
+                                </form>
                             </div>
                         </div>
                     </div>
@@ -239,79 +196,68 @@ if($_GET[del]!="")
 
            
             
-         <!-- Page Heading -->
-         <div class="card shadow mb-4 mx-auto" >
+                     <!-- Page Heading -->
+                    <div class="card shadow mb-4 mx-auto" >
                         <div class="card-header py-3" id="headingTwo">
-                        <h6 class="m-0 font-weight-bold text-primary" data-toggle="collapse" data-target="#collapseListado" aria-expanded="true" aria-controls="collapseListado">Productos</h6>
+                        <h6 class="m-0 font-weight-bold text-primary" data-toggle="collapse" data-target="#collapseListado" aria-expanded="true" aria-controls="collapseListado">Productos activos</h6>
                         </div>
                         <div id="collapseListado" class="collapse <?php echo $showtable; ?>" aria-labelledby="headingTwo" data-parent="#accordion">
                             <div class="card-body" >
                              <div class="table-responsive" style="padding-right: 1% !important;">
-                                    <table class="table table-bordered display nowrap" id="dataTable-mensajes" width="100%" cellspacing="0">
+                                    <table class="table table-striped table-bordered display nowrap" id="dataTable-mensajes" width="100%" cellspacing="0">
                                     <thead>
-                                    
                                     <tr>
-                                        <th>Codigo de Barras</th>
+                                        <th>Cod.</th>
                                         <th>Nombre</th>
-                                        <th>Descripción</th>
+                                        
                                         <th>Precio</th>
-                                        <th>Stock</th>
-                                        <th>Foto</th>
                                         <th>Categoria</th>
+                                        <th>Marca</th>
+                                        <th>Orden</th>
+                                        
                                         <th>Opciones</th>
-
                                     </tr>
                                     </thead>
                                     <tfoot>
                                     <tr>
-                                        <th>Codigo de Barras</th>
+                                        <th>Cod.</th>
                                         <th>Nombre</th>
-                                        <th>Descripción</th>
+                                        
                                         <th>Precio</th>
-                                        <th>Stock</th>
-                                        <th>Foto</th>
                                         <th>Categoria</th>
+                                        
+                                        <th>Marca</th>
+                                        <th>Orden</th>
                                         <th>Opciones</th>
-
                                     </tr>
                                     </tfoot>
                                     <tbody>
-                                        <?php $q=mysqli_query($con,"SELECT id_producto, foto, descripcion, P.Nombre as 'NombreP', P.Precio as 'PrecioP', P.stock as 'StockP', P.codigo_barra as 'codigo_barraP',
-                                                                    C.Nombre as 'NonbreC' 
-                                                                    FROM productos P 
-                                                                    JOIN categorias C 
-                                                                    ON P.id_categoria = C.id_categoria
-                                                                    order by P.nombre;"); 
+                                        <?php $q=mysqli_query($con,"select p.*, m.nombre as marca, c.nombre as categoria from productos p, marcas m, categorias c where p.id_marca=m.id and p.activo='si' and p.id_categoria=c.id order by p.orden"); 
                                             if(mysqli_num_rows($q)!=0){
                                                 while($r=mysqli_fetch_array($q)){?>
                                                  <tr>
-                                                    <td><?php echo $r['codigo_barraP']; ?></td>
-                                                     <td><?php echo $r['NombreP']; ?></td>
-                                                     <td><?php echo $r['descripcion']; ?></td>
+                                                    <td><?php echo $r['codigo']; ?></td>
+                                                    <td><?php echo $r['nombre']; ?></td>
+                                                    <td>$<?php echo number_format($r['precio'],2,',','.'); ?></td>
+                                                    <td><?php echo $r['categoria']; ?></td>
+                                                    <td><?php echo $r['marca']; ?></td>
+                                                    <td><?php echo $r['orden']; ?></td>
+                                                    
+                                                    <td>
+                                                        <a href="home.php?pagina=productos&ver=<?php echo $r['id'] ?>" title="Editar" alt="Editar"><i class="fas fa-edit icono_editar"></i></a> 
+                                                        
+                                                        <a href="javascript:if(confirm('Esta Seguro?')){ window.location='home.php?pagina=productos&desactivar=<?php echo $r['id'] ?>'; }" title="Desactivar" alt="Desactivar"><i class="fas fa-eraser icono_borrar"></i></a>
+                                                        
+                                                        <a href="#" title="Gestón de Fotos" alt="Gestón de Fotos" onclick="a=window.open('modulos/fotos_productos.php?id=<?php echo $r['id']; ?>','Permisos','width=1024,height=500,scrollbars=1'); a.moveTo(250,150)"><i class="fas fa-image icono_fotos"></i></a>
 
-                                                     <td>$ <?php echo number_format($r['PrecioP'],2,',','.'); ?></td>
-                                                     <td><?php echo number_format($r['StockP'],0,',','.'); ?></td>
-                                                     
-                                                     
-                                                     <td>
-                                                            <?php
-                                                            if(file_exists("fotos/".$r['foto']) && !empty($r['foto']))
-                                                            {
-                                                                ?>
-                                                                <img src="fotos/<?php echo $r['foto'];?>" width="50">
-                                                                <?php
-                                                            }
-                                                            ?>
+                                                        <a href="#" title="Gráfico Histórico" alt="Gráfico Histórico" onclick="a=window.open('modulos/grafico_precios_productos.php?id=<?php echo $r['id']; ?>','Historial de Precios','width=1024,height=500,scrollbars=1'); a.moveTo(250,150)"><i class='fas fa-layer-group'></i></a>
+
+                                                        <!--<a href="#" onclick="a=window.open('https://www.facebook.com/sharer/sharer.php?u=http://marcelomarini.com.ar/modulos/ficha_fb.php?id=<?php echo $r['id']; ?>','Compartir','width=1024,height=500,scrollbars=1'); a.moveTo(250,150)"><i class="fab fa-facebook"></i></a>-->
+
                                                     </td>
-                                                    <td><?php echo $r['NonbreC']; ?></td>
-                                                     <td>
-                                                        <a href="home.php?pagina=productos&ver=<?php echo $r['id_producto'] ?>" title="Editar" alt="Editar"><i class="fas fa-edit icono_editar"></i></a> 
-                                                        <a href="javascript:if(confirm('Esta Seguro?')){ window.location='home.php?pagina=productos&del=<?php echo $r['id_producto'] ?>'; }" title="Eliminar" alt="Eliminar"><i class="fas fa-eraser icono_borrar"></i></a>
-                                                    </td>
-                                                 </tr>                                                   
+                                                 </tr>       
                                              <?php }
                                              }?>       
-                                        
                                     </tbody>
                                     </table>
                                 </div>
@@ -321,11 +267,7 @@ if($_GET[del]!="")
                 </div>
             </div>
 
-    </div>
-    
-    
-
-
+    </div>  
 <script src="vendor/ckeditor/ckeditor.js"></script> 
 <script type="text/javascript">
  //inicio editor

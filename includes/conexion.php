@@ -2,7 +2,7 @@
 function conectar()
 {
 	global $con;
-	$con = mysqli_connect("localhost","root","","facturacionsimple2");
+	$con = mysqli_connect("localhost","root","","facturacionsimple");
 		/* comprobar la conexión */
 		if (mysqli_connect_errno()) 
 		{

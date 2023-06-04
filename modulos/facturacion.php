@@ -82,69 +82,12 @@ if($_GET['del']!="")
 <script src="https://unpkg.com/html5-qrcode"></script>
 
 <style>
-  
-@media only screen and (max-width: 600px) {
-  table {
-    font-size: 12px;
-  }
-  th:nth-child(3),
-  td:nth-child(3) {
-    display: none;
-  }
-  #totalMostrado {
+   @media only screen and (max-width: 767px) {
+    #totalMostrado {
         text-align: center;
     }
 }
 
-/* Para pantallas medianas, mostrar todas las columnas y ajustar el tamaño de fuente */
-@media only screen and (min-width: 601px) and (max-width: 1024px) {
-  table {
-    font-size: 14px;
-  }
-}
-.input-qty {
-  display: inline-block;
-  width: 50px;
-  padding: 0.1rem 0.2rem;
-  font-size: 0.9rem;
-  line-height: 1.5;
-  text-align: center;
-  vertical-align: middle;
-  border: 1px solid #ced4da;
-  border-radius: 0.25rem;
-}
-
-.btn-qty {
-  display: inline-block;
-  width: 30px;
-  padding: 0.2rem 0.4rem;
-  font-size: 0.9rem;
-  font-weight: 400;
-  line-height: 1.5;
-  text-align: center;
-  white-space: nowrap;
-  vertical-align: middle;
-  cursor: pointer;
-  user-select: none;
-  background-color: #fff;
-  border: 1px solid #ced4da;
-  border-radius: 0.25rem;
-  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
-}
-
-.btn-qty:hover {
-  border-color: #a7aeb5;
-}
-
-.btn-qty:focus {
-  border-color: #86b7fe;
-  box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
-}
-
-.btn-qty:active {
-  background-color: #e9ecef;
-  border-color: #e9ecef;
-}
 
  
 </style>
@@ -509,8 +452,8 @@ $(document).on('select2:open', () => {
 
 <script>
     var html5QrcodeScanner = new Html5QrcodeScanner(
-	"reader", { fps: 1, qrbox: 250 });
-    html5QrcodeScanner.render(onScanSuccess);
+	"reader", { fps: 0.5, qrbox: 250 });
+html5QrcodeScanner.render(onScanSuccess);
 
 
 function onScanSuccess(decodedText, decodedResult) {
@@ -519,30 +462,29 @@ function onScanSuccess(decodedText, decodedResult) {
   
   scanInput.val(decodedText);
 
+  // Emite un sonido al escanear un código
+  var beepSound = document.getElementById("beep");
+  beepSound.play();
 
   // Para enviar el codigo por get
   var scanInputValue = decodedText;
 
   $.ajax({
-    //url: "https://c0b6-138-186-162-59.ngrok-free.app/facturacionsimplephp/buscarAjax.php",
-    url: "http://localhost/facturacionsimplephp/buscarAjax.php",
+    url: "https://9528-138-186-162-59.ngrok-free.app/facturacionsimplephp/buscarAjax.php",
+    //url: "http://localhost/facturacionmovil/buscarAjax.php",
     data: { w1: scanInputValue },
     type: "GET",
     //especifica que se recibe en formato JSON y no hace falta usar el parse
     //dataType: "json",
     success: function (response) {
         if (!response.error) {
-            // Emite un sonido al escanear un código si se recibe un response
-            var beepSound = document.getElementById("beep");
-            beepSound.play();
             //aca se convirte el string en JSON
             let tasks = JSON.parse(response);           
             $('#nombreInput').val(tasks[0].name);
             $('#precioInput').val(tasks[0].price);
             $('#id').val(tasks[0].id);
               // Llama a la función AddProductos() después de actualizar los campos
-            AddProductos();        
-                
+            AddProductos();
                 }
                 } ,
             error: function(jqXHR, textStatus, errorThrown) {
