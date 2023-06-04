@@ -4,6 +4,11 @@ session_start();
 //conectar(); 
 //include ("funciones.php");
 
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+//error_reporting(E_ALL);
+error_reporting(E_ERROR | E_PARSE);
+
 if($_SESSION[user]==0)
 {
     echo "<script>window.location='index.php';</script>";

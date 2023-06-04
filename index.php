@@ -47,14 +47,13 @@ if($_GET[logout]=="ok")
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <meta name="description" content="Facturación Simple - Sistema de Gestión">
+    <meta name="description" content="SysCSVD - Sistema de Gestión">
     <meta name="author" content="ADM">
 
-    <title>Facturación Simple - Sistema de Gestión</title>
+    <title>SysCSVD - Sistema de Gestión</title>
 
     <!-- Custom fonts for this template-->
-
-    <link rel="shortcut icon" href="img/logo_mmtrico4.png">
+    <!-- <link rel="shortcut icon" href="img/logo_mmtrico4.png"> -->
 
     <link href="vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
     <link
@@ -83,7 +82,7 @@ if($_GET[logout]=="ok")
                             <div class="col-lg-12">
                                 <div class="p-5">
                                     <div class="text-center">
-                                        <img src="img/logo_mmtr.png" style="width:70%;">
+                                       <!-- <img src="img/logo_mmtr.png" style="width:70%;"> --> 
                                     </div>
                                     <div class="text-center">
                                         <br>
